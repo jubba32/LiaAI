@@ -9,14 +9,12 @@ LiaAI ist eine Chrome Extension, die den sichtbaren Seiteninhalt per Screenshot 
 ## Features
 
 | Feature | Beschreibung |
-|---|---|
+|---|---|---|
 | **Screenshot-Analyse** | `Cmd+Shift+Y` fotografiert die sichtbare Seite, Gemini antwortet direkt |
 | **Auswahl-Analyse** | `Cmd+Shift+K` analysiert nur markierten Text |
 | **Stealth-Mode** | Mini-Text zentriert unten, kaum sichtbar, passt sich der Seiten-Schrift an |
 | **Clipboard-Mode** | Antwort landet direkt in der Zwischenablage, kein Overlay |
-| **Doppel-Rechtsklick** | Markierten Text per Doppel-Klick analysieren |
 | **Ctrl+C Trigger** | Kopieren = automatische Analyse |
-| **Triple-Click** | Drei Klicks = Element analysieren |
 | **Esc-Dismiss** | Overlay sofort per Escape-Taste schließen |
 | **Auto-Dismiss** | Konfigurierbare Selbstzerstörung (3–20 Sekunden) |
 | **History** | Letzte 3 Antworten im Popup einsehbar |
@@ -48,12 +46,10 @@ LiaAI ist eine Chrome Extension, die den sichtbaren Seiteninhalt per Screenshot 
 ### Shortcuts
 
 | Tastenkombination | Funktion |
-|---|---|
+|---|---|---|
 | **Cmd+Shift+Y** | Gesamte Seite per Screenshot analysieren |
 | **Cmd+Shift+K** | Markierten Text analysieren |
-| **Doppel-Rechtsklick** | Schnellanalyse auf markiertem Text |
 | **Ctrl+C** | Kopieren = Analyse (wenn Text markiert) |
-| **Triple-Click** | Element-Text analysieren |
 | **Esc** | Overlay sofort schließen |
 
 > Shortcuts können unter `chrome://extensions/shortcuts` individuell angepasst werden.

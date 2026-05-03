@@ -258,59 +258,12 @@
     }
   });
 
-  // --- Doppel-Rechtsklick ---
-  var rightClickCount = 0;
-  var rightClickTimer = null;
-  document.addEventListener("contextmenu", function (e) {
-    var selText = getSelectionText();
-    if (!selText || selText.length < 3) { rightClickCount = 0; return; }
-    rightClickCount++;
-    if (rightClickTimer) clearTimeout(rightClickTimer);
-    rightClickTimer = setTimeout(function () { rightClickCount = 0; }, 500);
-    if (rightClickCount >= 2) {
-      e.preventDefault();
-      e.stopPropagation();
-      rightClickCount = 0;
-      if (rightClickTimer) clearTimeout(rightClickTimer);
-      triggerAnalysis(selText);
-    }
-  }, true);
-
   // --- Ctrl+C -> Auto-Analyse ---
   document.addEventListener("copy", function () {
     var selText = getSelectionText();
     if (selText && selText.length >= 3) {
       triggerAnalysis(selText);
     }
-  });
-
-  // --- Triple-Click -> Auto-Analyse ---
-  var clickCount = 0;
-  var clickTimer = null;
-  var clickTarget = null;
-  document.addEventListener("click", function (e) {
-    if (e.target === clickTarget && Date.now() - (clickTimer || 0) < 400) {
-      clickCount++;
-    } else {
-      clickCount = 1;
-      clickTarget = e.target;
-    }
-    if (clickCount >= 3) {
-      clickCount = 0;
-      clickTarget = null;
-
-      var el = e.target;
-      while (el && el.textContent && el.textContent.trim().length < 10) {
-        el = el.parentElement;
-      }
-      if (el) {
-        var text = el.textContent.trim();
-        if (text.length >= 3) {
-          triggerAnalysis(text.substring(0, 3000));
-        }
-      }
-    }
-    clickTimer = Date.now();
   });
 
   chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
