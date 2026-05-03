@@ -1,4 +1,4 @@
-# <img src="chrome-extension/icons/icon-48.png" width="32" height="32" valign="middle"> LiaAI
+# LiaAI
 
 > **Screenshot-Analyse per Knopfdruck – unsichtbare KI-Antworten für Prüfungen & Tests**
 
@@ -21,37 +21,6 @@ LiaAI ist eine Chrome Extension, die den sichtbaren Seiteninhalt per Screenshot 
 | **Auto-Dismiss** | Konfigurierbare Selbstzerstörung (3–20 Sekunden) |
 | **History** | Letzte 3 Antworten im Popup einsehbar |
 | **Eigener Prompt** | System-Prompt anpassbar (Leer = Few-Shot-Default) |
-
----
-
-## Screenshots
-
-### Popup – Einstellungen
-> *API-Key, Modell-Wahl, Anzeige-Modus, Stealth-Optionen, History*
-
-<!-- TODO: Screenshot popup.png einfügen -->
-<p align="center">
-  <img src="screenshots/popup.png" alt="LiaAI Popup" width="340">
-  <br><em>Popup mit Gemini-Key, Modell-Auswahl und Stealth-Optionen</em>
-</p>
-
-### Normal-Mode – Overlay oben rechts
-> *Glass-Morphism Card mit Close-Button*
-
-<!-- TODO: Screenshot normal.png einfügen -->
-<p align="center">
-  <img src="screenshots/normal.png" alt="LiaAI Normal Mode" width="400">
-  <br><em>Antwort erscheint als Overlay oben rechts</em>
-</p>
-
-### Stealth-Mode – Mini-Text zentriert unten
-> *Fast unsichtbar, erbt Seiten-Schrift und -Farbe*
-
-<!-- TODO: Screenshot stealth.png einfügen -->
-<p align="center">
-  <img src="screenshots/stealth.png" alt="LiaAI Stealth Mode" width="400">
-  <br><em>Dezent unten mittig – fällt kaum auf</em>
-</p>
 
 ---
 
