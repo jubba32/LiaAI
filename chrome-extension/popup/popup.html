@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LiaAI – Einstellungen</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <span class="logo">&#9670; LiaAI</span>
+      <span class="version">v2.0</span>
+    </div>
+
+    <div class="section">
+      <label for="geminiKey">Gemini API Key</label>
+      <div class="input-row">
+        <input type="password" id="geminiKey" placeholder="AIza…" autocomplete="off">
+        <button id="toggleGeminiKey" class="btn-icon" title="Anzeigen/Verstecken">&#128065;</button>
+      </div>
+      <a href="https://aistudio.google.com/apikey" target="_blank" class="hint">Key erstellen &#8599;</a>
+    </div>
+
+    <div class="section">
+      <label for="model">Gemini Modell</label>
+      <select id="model">
+        <option value="gemini-2.5-flash" selected>Gemini 2.5 Flash – schnell & günstig</option>
+        <option value="gemini-2.5-pro">Gemini 2.5 Pro – beste Qualität</option>
+      </select>
+    </div>
+
+    <div class="section">
+      <label for="displayMode">Anzeige-Modus</label>
+      <select id="displayMode">
+        <option value="normal">Normal – Overlay oben rechts</option>
+        <option value="stealth">Stealth – Mini-Text zentriert unten</option>
+        <option value="clipboard">Clipboard – Nur in Zwischenablage</option>
+      </select>
+    </div>
+
+    <div class="section stealth-options" id="stealthOptions">
+      <label for="autoDismiss">Auto-Dismiss</label>
+      <select id="autoDismiss">
+        <option value="3">3 Sekunden</option>
+        <option value="6" selected>6 Sekunden</option>
+        <option value="10">10 Sekunden</option>
+        <option value="20">20 Sekunden</option>
+      </select>
+      <label class="checkbox-label">
+        <input type="checkbox" id="noLoadingIndicator">
+        Kein Lade-Indikator (komplett unsichtbar laden)
+      </label>
+    </div>
+
+    <div class="section">
+      <label for="customPrompt">Eigener System-Prompt</label>
+      <textarea id="customPrompt" rows="4" placeholder="Leer lassen für Standard-Prompt (mit Few-Shot-Beispiel)"></textarea>
+      <p class="hint">&#9432; Standard: KI beginnt mit Optionsnummer + Antwort</p>
+    </div>
+
+    <div class="section">
+      <label>Shortcuts</label>
+      <div class="shortcut-row">
+        <span class="shortcut-label">Seite:</span>
+        <span id="shortcutAnalyzeScreenshot" class="shortcut-value">Cmd+Shift+Y</span>
+      </div>
+      <div class="shortcut-row">
+        <span class="shortcut-label">Auswahl:</span>
+        <span id="shortcutAnalyzeSelection" class="shortcut-value">Cmd+Shift+K</span>
+      </div>
+      <p class="hint">Markieren + Shortcut | Doppel-Rechtsklick</p>
+      <p class="hint">Ctrl+C | Triple-Click = Schnellanalyse</p>
+      <p class="hint">Esc = Overlay sofort schließen</p>
+      <p class="hint"><a href="#" id="openShortcuts" class="hint">Shortcuts in Chrome anpassen &#8599;</a></p>
+    </div>
+
+    <div class="section" id="historySection" style="display:none">
+      <label>Letzte Antworten</label>
+      <div id="historyList"></div>
+    </div>
+
+    <div class="actions">
+      <button id="saveBtn" class="btn-primary">Speichern</button>
+      <span id="status" class="status"></span>
+    </div>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>

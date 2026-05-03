@@ -1,0 +1,50 @@
+{
+  "manifest_version": 3,
+  "name": "LiaAI",
+  "version": "1.2.0",
+  "description": "Seiteninhalt analysieren und KI-Antwort direkt auf der Seite anzeigen – powered by DeepSeek.",
+  "permissions": ["activeTab", "storage", "scripting", "clipboardWrite"],
+  "host_permissions": [
+    "https://generativelanguage.googleapis.com/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "commands": {
+    "analyze-screenshot": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+Y",
+        "mac": "Command+Shift+Y"
+      },
+      "description": "LiaAI: Seite analysieren"
+    },
+    "analyze-selection": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+K",
+        "mac": "Command+Shift+K"
+      },
+      "description": "LiaAI: Auswahl analysieren (Text markieren, dann Shortcut)"
+    }
+  },
+  "action": {
+    "default_popup": "popup/popup.html",
+    "default_title": "LiaAI – Einstellungen",
+    "default_icon": {
+      "16": "icons/icon-16.png",
+      "48": "icons/icon-48.png",
+      "128": "icons/icon-128.png"
+    }
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "css": ["content.css"]
+    }
+  ],
+  "icons": {
+    "16": "icons/icon-16.png",
+    "48": "icons/icon-48.png",
+    "128": "icons/icon-128.png"
+  }
+}

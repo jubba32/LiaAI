@@ -1,0 +1,273 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  width: 340px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: #1a1a2e;
+  color: #d4d4e8;
+  font-size: 13px;
+}
+
+.container {
+  padding: 16px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #2d2d5e;
+}
+
+.logo {
+  color: #7c83ff;
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: 0.5px;
+}
+
+.version {
+  color: #555588;
+  font-size: 11px;
+}
+
+.section {
+  margin-bottom: 14px;
+}
+
+.section label {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  color: #8888aa;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+}
+
+.input-row {
+  display: flex;
+  gap: 6px;
+}
+
+input[type="text"],
+input[type="password"],
+select,
+textarea {
+  flex: 1;
+  padding: 8px 10px;
+  background: #0f0f23;
+  border: 1px solid #2d2d5e;
+  border-radius: 6px;
+  color: #e0e0f0;
+  font-size: 12px;
+  font-family: "SF Mono", "Menlo", monospace;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+textarea {
+  width: 100%;
+  resize: vertical;
+  line-height: 1.4;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: #7c83ff;
+}
+
+select {
+  width: 100%;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23888' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  padding-right: 28px;
+}
+
+.btn-icon {
+  background: #2d2d5e;
+  border: 1px solid #3d3d6e;
+  border-radius: 6px;
+  color: #aaa;
+  cursor: pointer;
+  padding: 6px 8px;
+  font-size: 14px;
+  transition: background 0.15s;
+}
+
+.btn-icon:hover {
+  background: #3d3d6e;
+}
+
+.hint {
+  display: inline-block;
+  margin-top: 4px;
+  font-size: 11px;
+  color: #7c83ff;
+  text-decoration: none;
+}
+
+.hint:hover {
+  text-decoration: underline;
+}
+
+.hint-sub {
+  margin-top: 3px;
+  font-size: 10px;
+  color: #555577;
+  line-height: 1.3;
+}
+
+.label-optional {
+  font-weight: 400 !important;
+  text-transform: none !important;
+  color: #555588 !important;
+}
+
+.label-highlight {
+  font-weight: 600 !important;
+  text-transform: none !important;
+  color: #4ade80 !important;
+}
+
+code {
+  background: #2d2d5e;
+  padding: 1px 5px;
+  border-radius: 3px;
+  font-size: 11px;
+}
+
+.shortcut-display {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+kbd {
+  background: #2d2d5e;
+  border: 1px solid #3d3d6e;
+  border-radius: 4px;
+  padding: 3px 7px;
+  font-size: 11px;
+  font-family: "SF Mono", "Menlo", monospace;
+  color: #ccc;
+}
+
+.shortcut-row {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.shortcut-label {
+  font-size: 11px;
+  color: #8888aa;
+  min-width: 48px;
+}
+
+.shortcut-value {
+  font-size: 12px;
+  font-family: "SF Mono", "Menlo", monospace;
+  color: #ccc;
+  font-weight: 500;
+}
+
+.stealth-options {
+  display: none;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid #2d2d5e;
+}
+
+.btn-primary {
+  padding: 8px 20px;
+  background: #7c83ff;
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.btn-primary:hover {
+  background: #6b72ee;
+}
+
+.btn-primary:active {
+  background: #5a61dd;
+}
+
+.status {
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.status.success {
+  color: #4ade80;
+}
+
+.status.error {
+  color: #f87171;
+}
+
+.checkbox-label {
+  display: flex !important;
+  align-items: center;
+  gap: 6px;
+  text-transform: none !important;
+  font-weight: 400 !important;
+  font-size: 12px !important;
+  color: #d4d4e8 !important;
+  cursor: pointer;
+  margin-top: 8px;
+}
+
+.checkbox-label input[type="checkbox"] {
+  width: 14px;
+  height: 14px;
+  accent-color: #7c83ff;
+  cursor: pointer;
+}
+
+.history-item {
+  display: flex;
+  gap: 8px;
+  padding: 5px 0;
+  border-bottom: 1px solid #1a1a2e;
+  font-size: 11px;
+}
+
+.history-time {
+  color: #555588;
+  flex-shrink: 0;
+  font-family: "SF Mono", "Menlo", monospace;
+}
+
+.history-text {
+  color: #aaaacc;
+  white-space: pre-line;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
