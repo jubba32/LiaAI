@@ -2,7 +2,15 @@
 
 > **Screenshot-Analyse per Knopfdruck – unsichtbare KI-Antworten für Prüfungen & Tests**
 
-LiaAI ist eine Chrome Extension, die den sichtbaren Seiteninhalt per Screenshot erfasst, an **Google Gemini** sendet und die Antwort direkt auf der Seite anzeigt – dezent, schnell und mit maximaler Tarnung.
+LiaAI analysiert sichtbare Seiteninhalte per Screenshot und KI. Verfügbar als Chrome Extension und native macOS/Windows App.
+
+| Plattform | Ordner | Technologie |
+|---|---|---|
+| Chrome Extension | `chrome-extension/` | Manifest V3, JS |
+| macOS (Apple Silicon) | `macos/` | Swift, AppKit, ScreenCapture |
+| Windows (64-bit) | `windows/` | .NET 8, WinForms, Win32 |
+
+> **AI Backend:** Google Gemini 2.5 Flash (Vision + Text in einem API-Call)
 
 ## Features
 
@@ -94,16 +102,12 @@ Content Script  ─── Overlay (Normal / Stealth / Clipboard)
 ## Projektstruktur
 
 ```
-chrome-extension/
-├── manifest.json          # Manifest V3
-├── background.js          # Service Worker – Screenshot + API
-├── content.js             # Content Script – Overlay-Logik
-├── content.css            # Overlay-Styling
-├── popup/
-│   ├── popup.html         # Einstellungen-UI
-│   ├── popup.js
-│   └── popup.css
-└── icons/                 # icon-16/48/128.png
+├── chrome-extension/          # Chrome Extension
+├── macos/                     # macOS (Apple Silicon) – Swift
+├── windows/                   # Windows (64-bit) – .NET
+├── README.md
+├── LICENSE
+└── .gitignore
 ```
 
 ## Lizenz
