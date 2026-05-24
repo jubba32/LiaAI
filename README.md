@@ -2,19 +2,12 @@
 
 > **Screenshot-Analyse per Knopfdruck – unsichtbare KI-Antworten für Prüfungen & Tests**
 
-LiaAI analysiert sichtbare Seiteninhalte per Screenshot und KI. Verfügbar als Chrome Extension und native macOS/Windows App.
-
-| Plattform | Ordner | Technologie |
-|---|---|---|
-| Chrome Extension | `chrome-extension/` | Manifest V3, JS |
-| macOS (Apple Silicon) | `macos/` | Swift, AppKit, ScreenCapture |
-| Windows (64-bit) | `windows/` | .NET 8, WinForms, Win32 |
-
-> **AI Backend:** Google Gemini 2.5 Flash (Vision + Text in einem API-Call)
+LiaAI ist eine Chrome Extension, die sichtbare Seiteninhalte per Screenshot erfasst, an **Google Gemini** sendet und die Antwort direkt auf der Seite anzeigt – dezent, schnell und mit maximaler Tarnung.
 
 ## Features
 
-- **Screenshot-Analyse** – `Cmd+Shift+Y` fotografiert die sichtbare Seite, Gemini antwortet direkt
+- **Snipping-Tool** – `Cmd+Shift+Y` öffnet Bereichsauswahl (wie Windows Snipping Tool), nur die markierte Fläche wird analysiert
+- **Ganze Seite** – `Enter` während der Bereichsauswahl analysiert den gesamten sichtbaren Bereich
 - **Auswahl-Analyse** – `Cmd+Shift+K` analysiert nur markierten Text
 - **Stealth-Mode** – Mini-Text zentriert unten, kaum sichtbar, passt sich der Seiten-Schrift an
 - **Clipboard-Mode** – Antwort landet direkt in der Zwischenablage, kein Overlay
@@ -47,7 +40,9 @@ LiaAI analysiert sichtbare Seiteninhalte per Screenshot und KI. Verfügbar als C
 
 | Tastenkombination | Funktion |
 | --- | --- |
-| **Cmd+Shift+Y** | Gesamte Seite per Screenshot analysieren |
+| **Cmd+Shift+Y** | Snipping-Modus: Bereich auswählen und analysieren |
+| **Enter** *(im Snipping)* | Ganze Seite analysieren |
+| **Esc** *(im Snipping)* | Abbrechen |
 | **Cmd+Shift+K** | Markierten Text analysieren |
 | **Ctrl+C** | Kopieren = Analyse (wenn Text markiert) |
 | **Esc** | Overlay sofort schließen |
@@ -79,7 +74,7 @@ LiaAI analysiert sichtbare Seiteninhalte per Screenshot und KI. Verfügbar als C
 | --- | --- |
 | Extension | Chrome Manifest V3 |
 | AI Backend | Google Gemini 2.5 Flash |
-| Screenshot | `chrome.tabs.captureVisibleTab()` |
+| Screenshot | `chrome.tabs.captureVisibleTab()` + Canvas-Crop |
 | Content Injection | `chrome.scripting.executeScript()` |
 | Storage | `chrome.storage.sync` / `chrome.storage.local` |
 | Oberfläche | Vanilla JS, CSS (Glass-Morphism) |
@@ -90,7 +85,13 @@ LiaAI analysiert sichtbare Seiteninhalte per Screenshot und KI. Verfügbar als C
 Cmd+Shift+Y
     │
     ▼
-chrome.tabs.captureVisibleTab()  ─── JPEG Screenshot (Base64)
+Snipping-Overlay (Bereich auswählen)
+    │
+    ▼
+chrome.tabs.captureVisibleTab()  ─── Screenshot (PNG)
+    │
+    ▼
+Canvas-Crop auf Auswahl  ─── zugeschnittenes JPEG
     │
     ▼
 Gemini 2.5 Flash API  ─── Vision + Antwort (ein API-Call)
@@ -102,12 +103,16 @@ Content Script  ─── Overlay (Normal / Stealth / Clipboard)
 ## Projektstruktur
 
 ```
-├── chrome-extension/          # Chrome Extension
-├── macos/                     # macOS (Apple Silicon) – Swift
-├── windows/                   # Windows (64-bit) – .NET
-├── README.md
-├── LICENSE
-└── .gitignore
+chrome-extension/
+├── manifest.json          # Manifest V3
+├── background.js          # Service Worker – Screenshot, Crop, API
+├── content.js             # Content Script – Snipping, Overlay
+├── content.css            # Overlay-Styling
+├── popup/
+│   ├── popup.html         # Einstellungen-UI
+│   ├── popup.js
+│   └── popup.css
+└── icons/                 # icon-16/48/128.png
 ```
 
 ## Lizenz
