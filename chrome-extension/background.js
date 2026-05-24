@@ -105,7 +105,7 @@ chrome.commands.onCommand.addListener(async function (command) {
   }
 
   if (command === "analyze-screenshot") {
-    await analyze(tab.id, "");
+    await chrome.tabs.sendMessage(tab.id, { type: "snipping-start" });
     return;
   }
 });
@@ -114,7 +114,97 @@ chrome.runtime.onMessage.addListener(function (message, sender) {
   if (message.type === "trigger-analysis" && sender.tab?.id) {
     analyze(sender.tab.id, message.context || "");
   }
+
+  if (message.type === "snipping-area" && sender.tab?.id) {
+    handleSnipping(sender.tab.id, message.rect || null);
+  }
+
+  if (message.type === "snipping-result" && sender.tab?.id) {
+    handleSnippingResult(sender.tab.id, message.dataUrl || "");
+  }
 });
+
+async function handleSnipping(tabId, rect) {
+  if (rect === null) {
+    // Cancelled
+    return;
+  }
+
+  try {
+    var settings = await chrome.storage.sync.get([
+      "geminiKey", "model", "customPrompt",
+    ]);
+    var geminiKey = (settings.geminiKey || "").trim();
+    if (!geminiKey) { chrome.action.openPopup(); return; }
+
+    setBadge("...", "#fbbf24");
+    await chrome.tabs.sendMessage(tabId, { type: "loading" });
+
+    var screenshot = await chrome.tabs.captureVisibleTab(null, {
+      format: "png",
+    });
+
+    if (rect.width > 0 && rect.height > 0) {
+      await chrome.tabs.sendMessage(tabId, {
+        type: "crop-and-return",
+        dataUrl: screenshot,
+        rect: rect,
+      });
+    } else {
+      // Full page (Enter was pressed)
+      var model = settings.model || "gemini-2.5-flash";
+      var systemPrompt =
+        (settings.customPrompt || "").trim() || DEFAULT_SYSTEM_PROMPT;
+      var base64 = screenshot.split(",")[1];
+      var answer = await callGeminiVision(base64, geminiKey, model, systemPrompt);
+
+      setBadge("", "");
+      saveHistory(answer);
+      await chrome.tabs.sendMessage(tabId, { type: "answer", text: answer });
+    }
+  } catch (error) {
+    console.error("LiaAI snipping error:", error);
+    setBadge("!", "#f87171");
+    setTimeout(function () { updateBadge(); }, 3000);
+    try {
+      await chrome.tabs.sendMessage(tabId, {
+        type: "error",
+        text: error.message || "Fehler",
+      });
+    } catch (_) {}
+  }
+}
+
+async function handleSnippingResult(tabId, dataUrl) {
+  try {
+    var settings = await chrome.storage.sync.get([
+      "geminiKey", "model", "customPrompt",
+    ]);
+    var geminiKey = (settings.geminiKey || "").trim();
+    if (!geminiKey) return;
+
+    var model = settings.model || "gemini-2.5-flash";
+    var systemPrompt =
+      (settings.customPrompt || "").trim() || DEFAULT_SYSTEM_PROMPT;
+    var base64 = dataUrl.split(",")[1];
+
+    var answer = await callGeminiVision(base64, geminiKey, model, systemPrompt);
+
+    setBadge("", "");
+    saveHistory(answer);
+    await chrome.tabs.sendMessage(tabId, { type: "answer", text: answer });
+  } catch (error) {
+    console.error("LiaAI result error:", error);
+    setBadge("!", "#f87171");
+    setTimeout(function () { updateBadge(); }, 3000);
+    try {
+      await chrome.tabs.sendMessage(tabId, {
+        type: "error",
+        text: error.message || "Fehler",
+      });
+    } catch (_) {}
+  }
+}
 
 async function analyze(tabId, contextText) {
   try {

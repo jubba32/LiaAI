@@ -16,7 +16,7 @@
         "default": "Ctrl+Shift+Y",
         "mac": "Command+Shift+Y"
       },
-      "description": "LiaAI: Seite analysieren"
+      "description": "LiaAI: Bereich auswählen und analysieren (Enter = ganze Seite)"
     },
     "analyze-selection": {
       "suggested_key": {

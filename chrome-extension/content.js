@@ -266,6 +266,142 @@
     }
   });
 
+  // --- Snipping Mode ---
+  var snippingEl = null;
+  var snippingStartX = 0;
+  var snippingStartY = 0;
+  var snippingRect = null;
+  var snippingRectEl = null;
+  var snippingCallback = null;
+
+  function startSnipping(callback) {
+    snippingCallback = callback;
+    removeOverlay();
+
+    snippingEl = document.createElement("div");
+    snippingEl.style.cssText =
+      "position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:2147483646;" +
+      "background:rgba(0,0,0,0.25);cursor:crosshair;";
+    document.body.appendChild(snippingEl);
+
+    var hint = document.createElement("div");
+    hint.style.cssText =
+      "position:fixed;top:8px;left:50%;transform:translateX(-50%);z-index:2147483647;" +
+      "padding:4px 12px;border-radius:4px;background:rgba(0,0,0,0.7);color:#fff;" +
+      "font-size:11px;font-family:-apple-system,sans-serif;" +
+      "pointer-events:none;white-space:nowrap;";
+    hint.textContent = "Bereich auswählen  |  Enter = ganze Seite  |  Esc = abbrechen";
+    snippingEl.appendChild(hint);
+
+    snippingRectEl = document.createElement("div");
+    snippingRectEl.style.cssText =
+      "position:fixed;z-index:2147483647;pointer-events:none;" +
+      "border:2px dashed rgba(124,131,255,0.8);background:rgba(124,131,255,0.08);display:none;";
+    document.body.appendChild(snippingRectEl);
+
+    snippingEl.addEventListener("mousedown", function (e) {
+      snippingStartX = e.clientX;
+      snippingStartY = e.clientY;
+      snippingRect = null;
+      snippingRectEl.style.display = "block";
+      snippingRectEl.style.left = e.clientX + "px";
+      snippingRectEl.style.top = e.clientY + "px";
+      snippingRectEl.style.width = "0px";
+      snippingRectEl.style.height = "0px";
+
+      function onMove(ev) {
+        var x = Math.min(snippingStartX, ev.clientX);
+        var y = Math.min(snippingStartY, ev.clientY);
+        var w = Math.abs(ev.clientX - snippingStartX);
+        var h = Math.abs(ev.clientY - snippingStartY);
+        snippingRectEl.style.left = x + "px";
+        snippingRectEl.style.top = y + "px";
+        snippingRectEl.style.width = w + "px";
+        snippingRectEl.style.height = h + "px";
+        snippingRect = {
+          x: x, y: y, width: w, height: h,
+        };
+      }
+
+      function onUp() {
+        document.removeEventListener("mousemove", onMove);
+        document.removeEventListener("mouseup", onUp);
+        if (snippingRect && snippingRect.width > 10 && snippingRect.height > 10) {
+          finishSnipping(snippingRect);
+        } else {
+          // If tiny selection, cancel
+          cancelSnipping();
+        }
+      }
+
+      document.addEventListener("mousemove", onMove);
+      document.addEventListener("mouseup", onUp);
+    });
+
+    function onKey(e) {
+      if (e.key === "Escape") {
+        document.removeEventListener("keydown", onKey);
+        cancelSnipping();
+      } else if (e.key === "Enter") {
+        document.removeEventListener("keydown", onKey);
+        finishSnipping(null); // full page
+      }
+    }
+    document.addEventListener("keydown", onKey);
+
+    // Click on overlay without drag = full page
+    var clicked = false;
+    snippingEl.addEventListener("mousedown", function () { clicked = true; });
+    snippingEl.addEventListener("mouseup", function () {
+      if (clicked && !snippingRect) {
+        clicked = false;
+      }
+    });
+  }
+
+  function finishSnipping(rect) {
+    var el = snippingEl;
+    var rEl = snippingRectEl;
+    snippingEl = null;
+    snippingRectEl = null;
+    snippingRect = null;
+    if (el) el.remove();
+    if (rEl) rEl.remove();
+
+    if (snippingCallback) {
+      snippingCallback(rect);
+      snippingCallback = null;
+    }
+  }
+
+  function cancelSnipping() {
+    finishSnipping(null);
+  }
+
+  function cropImageToBase64(dataUrl, rect) {
+    try {
+      var img = new Image();
+      return new Promise(function (resolve) {
+        img.onload = function () {
+          var canvas = document.createElement("canvas");
+          var dpr = window.devicePixelRatio || 1;
+          canvas.width = rect.width * dpr;
+          canvas.height = rect.height * dpr;
+          var ctx = canvas.getContext("2d");
+          ctx.drawImage(
+            img,
+            rect.x * dpr, rect.y * dpr, rect.width * dpr, rect.height * dpr,
+            0, 0, canvas.width, canvas.height
+          );
+          resolve(canvas.toDataURL("image/jpeg", 0.85));
+        };
+        img.src = dataUrl;
+      });
+    } catch (e) {
+      return Promise.resolve(dataUrl);
+    }
+  }
+
   chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
     if (message.type === "ping") {
       sendResponse({ ok: true });
@@ -279,6 +415,27 @@
       sendResponse({ text: extractPageText() });
     } else if (message.type === "get-selection") {
       sendResponse({ text: getSelectionText() });
+    } else if (message.type === "snipping-start") {
+      startSnipping(function (rect) {
+        chrome.runtime.sendMessage({
+          type: "snipping-area",
+          rect: rect,
+        });
+      });
+    } else if (message.type === "crop-and-return") {
+      if (message.rect) {
+        cropImageToBase64(message.dataUrl, message.rect).then(function (cropped) {
+          chrome.runtime.sendMessage({
+            type: "snipping-result",
+            dataUrl: cropped,
+          });
+        });
+      } else {
+        chrome.runtime.sendMessage({
+          type: "snipping-result",
+          dataUrl: message.dataUrl,
+        });
+      }
     }
   });
 
