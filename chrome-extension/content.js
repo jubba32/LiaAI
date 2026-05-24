@@ -270,7 +270,7 @@
   var snippingEl = null;
   var snippingStartX = 0;
   var snippingStartY = 0;
-  var snippingRect = null;
+  var snippingDragRect = null;
   var snippingRectEl = null;
   var snippingCallback = null;
 
@@ -302,7 +302,7 @@
     snippingEl.addEventListener("mousedown", function (e) {
       snippingStartX = e.clientX;
       snippingStartY = e.clientY;
-      snippingRect = null;
+      snippingDragRect = null;
       snippingRectEl.style.display = "block";
       snippingRectEl.style.left = e.clientX + "px";
       snippingRectEl.style.top = e.clientY + "px";
@@ -318,20 +318,16 @@
         snippingRectEl.style.top = y + "px";
         snippingRectEl.style.width = w + "px";
         snippingRectEl.style.height = h + "px";
-        snippingRect = {
-          x: x, y: y, width: w, height: h,
-        };
+        snippingDragRect = { x: x, y: y, width: w, height: h };
       }
 
       function onUp() {
         document.removeEventListener("mousemove", onMove);
         document.removeEventListener("mouseup", onUp);
-        if (snippingRect && snippingRect.width > 10 && snippingRect.height > 10) {
-          finishSnipping(snippingRect);
-        } else {
-          // If tiny selection, cancel
-          cancelSnipping();
+        if (snippingDragRect && snippingDragRect.width > 10 && snippingDragRect.height > 10) {
+          finishSnipping(snippingDragRect);
         }
+        // If tiny or no selection, overlay stays – user can try again or press Esc/Enter
       }
 
       document.addEventListener("mousemove", onMove);
@@ -341,60 +337,62 @@
     function onKey(e) {
       if (e.key === "Escape") {
         document.removeEventListener("keydown", onKey);
-        cancelSnipping();
+        cleanSnipping();
       } else if (e.key === "Enter") {
         document.removeEventListener("keydown", onKey);
-        finishSnipping(null); // full page
+        finishSnipping("full");
       }
     }
     document.addEventListener("keydown", onKey);
-
-    // Click on overlay without drag = full page
-    var clicked = false;
-    snippingEl.addEventListener("mousedown", function () { clicked = true; });
-    snippingEl.addEventListener("mouseup", function () {
-      if (clicked && !snippingRect) {
-        clicked = false;
-      }
-    });
   }
 
-  function finishSnipping(rect) {
+  function cleanSnipping() {
     var el = snippingEl;
     var rEl = snippingRectEl;
     snippingEl = null;
     snippingRectEl = null;
-    snippingRect = null;
+    snippingDragRect = null;
     if (el) el.remove();
     if (rEl) rEl.remove();
-
-    if (snippingCallback) {
-      snippingCallback(rect);
-      snippingCallback = null;
-    }
   }
 
-  function cancelSnipping() {
-    finishSnipping(null);
+  function finishSnipping(result) {
+    cleanSnipping();
+    if (snippingCallback) {
+      snippingCallback(result);
+      snippingCallback = null;
+    }
   }
 
   function cropImageToBase64(dataUrl, rect) {
     try {
       var img = new Image();
-      return new Promise(function (resolve) {
+      return new Promise(function (resolve, reject) {
         img.onload = function () {
-          var canvas = document.createElement("canvas");
-          var dpr = window.devicePixelRatio || 1;
-          canvas.width = rect.width * dpr;
-          canvas.height = rect.height * dpr;
-          var ctx = canvas.getContext("2d");
-          ctx.drawImage(
-            img,
-            rect.x * dpr, rect.y * dpr, rect.width * dpr, rect.height * dpr,
-            0, 0, canvas.width, canvas.height
-          );
-          resolve(canvas.toDataURL("image/jpeg", 0.85));
+          try {
+            var dpr = window.devicePixelRatio || 1;
+            var sx = Math.round(rect.x * dpr);
+            var sy = Math.round(rect.y * dpr);
+            var sw = Math.round(rect.width * dpr);
+            var sh = Math.round(rect.height * dpr);
+            // Clamp to image bounds
+            if (sx < 0) sx = 0;
+            if (sy < 0) sy = 0;
+            if (sx + sw > img.width) sw = img.width - sx;
+            if (sy + sh > img.height) sh = img.height - sy;
+            if (sw <= 0 || sh <= 0) { resolve(dataUrl); return; }
+
+            var canvas = document.createElement("canvas");
+            canvas.width = sw;
+            canvas.height = sh;
+            var ctx = canvas.getContext("2d");
+            ctx.drawImage(img, sx, sy, sw, sh, 0, 0, sw, sh);
+            resolve(canvas.toDataURL("image/jpeg", 0.85));
+          } catch (e) {
+            resolve(dataUrl);
+          }
         };
+        img.onerror = function () { resolve(dataUrl); };
         img.src = dataUrl;
       });
     } catch (e) {
@@ -416,11 +414,15 @@
     } else if (message.type === "get-selection") {
       sendResponse({ text: getSelectionText() });
     } else if (message.type === "snipping-start") {
-      startSnipping(function (rect) {
-        chrome.runtime.sendMessage({
-          type: "snipping-area",
-          rect: rect,
-        });
+      startSnipping(function (result) {
+        if (result === "full") {
+          chrome.runtime.sendMessage({ type: "snipping-area", fullPage: true });
+        } else if (result) {
+          chrome.runtime.sendMessage({
+            type: "snipping-area",
+            rect: result,
+          });
+        }
       });
     } else if (message.type === "crop-and-return") {
       if (message.rect) {

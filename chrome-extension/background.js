@@ -116,7 +116,7 @@ chrome.runtime.onMessage.addListener(function (message, sender) {
   }
 
   if (message.type === "snipping-area" && sender.tab?.id) {
-    handleSnipping(sender.tab.id, message.rect || null);
+    handleSnipping(sender.tab.id, message.fullPage ? "full" : (message.rect || null));
   }
 
   if (message.type === "snipping-result" && sender.tab?.id) {
@@ -125,7 +125,7 @@ chrome.runtime.onMessage.addListener(function (message, sender) {
 });
 
 async function handleSnipping(tabId, rect) {
-  if (rect === null) {
+  if (!rect) {
     // Cancelled
     return;
   }
@@ -144,14 +144,16 @@ async function handleSnipping(tabId, rect) {
       format: "png",
     });
 
-    if (rect.width > 0 && rect.height > 0) {
+    var isFullPage = rect === "full";
+
+    if (!isFullPage && rect.width > 0 && rect.height > 0) {
       await chrome.tabs.sendMessage(tabId, {
         type: "crop-and-return",
         dataUrl: screenshot,
         rect: rect,
       });
     } else {
-      // Full page (Enter was pressed)
+      // Full page
       var model = settings.model || "gemini-2.5-flash";
       var systemPrompt =
         (settings.customPrompt || "").trim() || DEFAULT_SYSTEM_PROMPT;
